@@ -8,7 +8,7 @@ class Node(object):
 		self.color
 		self.nums_child
 
-class AVLtree(object):
+class RedBlackTree(object):
 	def __init__(self):
 		self.nil = Node()
 		self.nil.nums_child  = 0

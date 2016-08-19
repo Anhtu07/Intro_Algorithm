@@ -260,3 +260,27 @@ def rank(self, key):
 		node = self.lca(start, end)
 		result = self.node_list(node, start, end)
 		return result
+
+	class TraceRedBlackTree(RedBlackTree):
+		"""Augments RedBlackTree to build a trace for the visualizer"""
+		def __init__(self, trace):
+			RedBlackTree.__init__(self)
+			self.trace = trace
+
+		def insert(self, node):
+			self.trace.append({'type': 'add', 'id' : node.wire.name})
+			RedBlackTree.insert(self, node)
+
+		def delete(self, node):
+			self.trace.append({'type': 'delete', 'id': node.wire.name})
+			RedBlackTree.remove(self, node)
+
+		def list(self, start, end):
+			result = RedBlackTree.list(self, start, end)
+			self.trace.append({'type': 'list', 'from': start, 'to': end, 'ids': restul})
+			return result
+
+		def count(self, start, end):
+			result = RedBlackTree.count(self, start, end)
+			self.trace.append({'type': 'count', 'from': start, 'to': end, 'id': result})
+			return result

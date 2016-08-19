@@ -214,16 +214,49 @@ class AVLtree(object):
     		self.right_rotate(x.parent)
     		x = self.root
 
-  def rank(self, key):
-  	"""Return number of nodes with key that are smaller than given key"""
+def rank(self, key):
+  	"""Return number of nodes with key that are smaller than or equal the given key"""
+  	number = 0
   	x = self.root
   	while x is not self.nil:
-  		if key > x.key:
+  		if x.key <= key:
+  			number = number + 2 + x.left.nums_child
   			x = x.right
   		else:
   			x = x.left
+  	return number
 
 	def count(self, start, end):
+		"""Return number of nodes with key that are smmaller than or equal 'end' and greater or equal than 'start'"""
+		if self.search(start) is not None:
+			return self.rank(end) - self.rank(start) + 1
+		else:
+			return self.rank(end) - self.rank(start)
 
+	def lca(self, low, high):
+		"""Lowest Common Ancestor"""
+		x = self.root
+		while x is not self.nil or (low <= x.key and h >= x.key):
+			if low < x.ley:
+				x = x.left
+			else:
+				x = x.right
+		return x
 
-	def list(self, start, enb):
+	def node_list(node, low, high):
+		result = []
+		if node is self.nil:
+			return result
+		if low <= node.key and node.key <= high:
+			result.append(node)
+		if low < node.key:
+			self.node_list(node.right, low, high)
+		if node.key <= high:
+			self.node_list(node.left, low, high)
+		return result
+
+	def list(self, start, end):
+		"""Return a list of nodes with key that are smmaller than or equal 'end' and greater or equal than 'start'"""
+		node = self.lca(start, end)
+		result = self.node_list(node, start, end)
+		return result

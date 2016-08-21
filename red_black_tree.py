@@ -1,20 +1,20 @@
 class Node(object):
 	def __init__(self, key):
-		self.left
-		self.right
-		self.parent
+		self.left = None
+		self.right = None
+		self.parent = None
 
 		self.key = key
-		self.color
-		self.nums_child
+		self.color =  None
+		self.nums_child = 0
 
 class RedBlackTree(object):
 	def __init__(self):
-		self.nil = Node()
+		self.nil = Node(None)
 		self.nil.nums_child  = 0
 		self.nil.color = 'BLACK'
 
-		self.root = Node()
+		self.root = Node(None)
 		self.root.parent = self.nil
 	def left_rotate(self, x):
 		""" Modify the change of number of children when left_rotate"""
@@ -53,32 +53,30 @@ class RedBlackTree(object):
 		y.nums_child = y.left.nums_child + y.right.nums_child + 2
 
 	def insert(self, z):
-		"""Modify the change of number of children when insert"""
-			y = self.nil
-			x = self.root
-			z.nums_child = 0
-			while x != self.nil:
-				y = x
-				if z.key < x.key:
-					x = x.left
-				else:
-					x = x.right
-			z.parent = y
-			if y == self.nil:
-				self.root = z
-			elif z.key < y.key:
-				y.left = z
+		if self.root.key is None:
+			self.root = z
+			return
+		x = self.root
+		while x != None:
+			y = x
+			if z.key < x.key:
+				x = x.left
 			else:
-				y.right = z
-			z.left = self.nil
-			z.right = self.root
-			z.color = 'RED'
-			temp = z
-			while temp.parent is not self.nil:
-				temp.parent.nums_child ++
-				temp = temp.parent
+				x = x.right
+		z.parent = y
+		if z.key < y.key:
+			y.left = z
+		else:
+			y.right = z
+		z.left = None
+		z.right = None
+		z.color = 'RED'
+		temp = z
+		while temp.parent is not None:
+			temp.parent.nums_child = temp.parent.nums_child + 1
+			temp = temp.parent
+		self.insert_fix_up(z)
 
-			self.fix_up(z)
 	def insert_fix_up(self, z):
 		while z.parent.color is 'RED':
 			if z.parent is z.parent.parent.left:
@@ -102,9 +100,9 @@ class RedBlackTree(object):
 				elif z is z.parent.left:
 					z = z.parent
 					self.right_rotate(z)
-				 	z.parent.color = 'BLACK'
-					z.parent.parent.color = 'RED'
-					self.left_rotate(z.parent.parent)
+				z.parent.color = 'BLACK'
+				z.parent.parent.color = 'RED'
+				self.left_rotate(z.parent.parent)
 
 	def transplant(self, u, v):
 		""" Replace subtree rooted at node u with that of node v"""
@@ -140,7 +138,7 @@ class RedBlackTree(object):
 			x = z.right
 			self.transplant(z, z.right)
 		elif z.right is self.nil:
-			x = z. 
+			x = z.left
 			self.transplant(z, z.left)
 		else:
 			y = self.min(z.right)
@@ -172,31 +170,31 @@ class RedBlackTree(object):
 		return x
 
 	def delete_fix_up(self, x):
-    while x is not self.root and x.color is 'BLACK':
-    	if x is x.parent.left:
-    		w = x.parent.right
-    		if w.color is 'RED':
-    			w.color == 'BLACK'
-    			w.parent.color = 'RED'
-    			self.left_rotate(x.parent)
-    			w = x.parent.right
-    		if w.left.color is 'BLACK' and w.right.color is 'BLACK':
-    			w.color = 'RED'
-    			x = x.parent
-    		elif w.right.color is 'BLACK':
-    			w.left.color = 'BLACK'
-    			w.color = 'RED'
-    			self.right_rotate(w)
-    			w = x.parent.right
-    		w.color = x.parent.color
-    		x.parent.color = 'BLACK'
-    		w.right.color = 'BLACK'
-    		self.left_rotate(x.parent)
-    		x = self.root
-    	else:
-    		w = x.parent.left
-    		if w.color is 'RED':
-    			w.color == 'BLACK'
+		while x is not self.root and x.color is 'BLACK':
+			if x is x.parent.left:
+				w = x.parent.right
+				if w.color is 'RED':
+					w.color == 'BLACK'
+					w.parent.color = 'RED'
+					self.left_rotate(x.parent)
+					w = x.parent.right
+				if w.left.color is 'BLACK' and w.right.color is 'BLACK':
+					w.color = 'RED'
+					x = x.parent
+				elif w.right.color is 'BLACK':
+					w.left.color = 'BLACK'
+					w.color = 'RED'
+					self.right_rotate(w)
+					w = x.parent.right
+				w.color = x.parent.color
+				x.parent.color = 'BLACK'
+				w.right.color = 'BLACK'
+				self.left_rotate(x.parent)
+				x = self.root
+			else:
+				w = x.parent.left
+				if w.color is 'RED':
+					w.color == 'BLACK'
     			w.parent.color = 'RED'
     			self.right_rotate(x.parent)
     			w = x.parent.left

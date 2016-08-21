@@ -11,19 +11,15 @@ class Node(object):
 class RedBlackTree(object):
 	def __init__(self):
 		self.nil = Node(None)
-		self.nil.nums_child  = 0
-		self.nil.color = 'BLACK'
-
 		self.root = Node(None)
-		self.root.parent = self.nil
 	def left_rotate(self, x):
 		""" Modify the change of number of children when left_rotate"""
 		y = x.right
 		x.right = y.left
-		if y.left != self.nil:
+		if y.left is not None:
 			y.left.parent = x
-		y,parent = x.parent
-		if x.parent == self.nil:
+		y.parent = x.parent
+		if x is self.root:
 			self.root = y
 		elif x == x.parent.left:
 			x.parent.left = y
@@ -31,30 +27,33 @@ class RedBlackTree(object):
 			x.parent.right = y
 		y.left = x
 		x.parent = y
-		x.nums_child = x.left.nums_child + x.right.nums_child + 2
-		y.nums_child = y.left.nums_child + y.right.nums_child + 2
+		#x.nums_child = x.left.nums_child + x.right.nums_child + 2
+		#y.nums_child = y.left.nums_child + y.right.nums_child + 2
 
 	def right_rotate(self, y):
 		""" Modify the change of number of children when right_rotate"""
 		x = y.left
 		y.left = x.right
-		if x.right != self.nil:
+		if x.right is not None:
 			x.right.parent = y
 		x,parent = y.parent
-		if y.parent == self.nil:
+		if y.parent is self.root:
 			self.root = x
-		elif y == y.parent.right:
+		elif y is y.parent.right:
 			y.parent.right = x
 		else:
 			y.parent.left = x
 		x.right = y
 		y.parent = x
-		x.nums_child = x.left.nums_child + x.right.nums_child + 2
-		y.nums_child = y.left.nums_child + y.right.nums_child + 2
+		#x.nums_child = x.left.nums_child + x.right.nums_child + 2
+		#y.nums_child = y.left.nums_child + y.right.nums_child + 2
 
 	def insert(self, z):
 		if self.root.key is None:
 			self.root = z
+			self.root.color = 'BLACK'
+			self.nil.color = 'BLACK'
+			self.root.parent = self.nil
 			return
 		x = self.root
 		while x != None:
@@ -68,22 +67,17 @@ class RedBlackTree(object):
 			y.left = z
 		else:
 			y.right = z
-		z.left = None
-		z.right = None
 		z.color = 'RED'
-		temp = z
-		while temp.parent is not None:
-			temp.parent.nums_child = temp.parent.nums_child + 1
-			temp = temp.parent
 		self.insert_fix_up(z)
 
 	def insert_fix_up(self, z):
 		while z.parent.color is 'RED':
 			if z.parent is z.parent.parent.left:
 				y = z.parent.parent.right
-				if y.color is 'RED':
+				if y is not None and y.color is 'RED':
 					z.parent.color = 'BLACK'
 					y.color = 'BLACK'
+					z.parent.parent.color = 'RED'
 					z = z.parent.parent
 				elif z is z.parent.right:
 					z = z.parent
@@ -91,18 +85,28 @@ class RedBlackTree(object):
 					z.parent.color = 'BLACK'
 					z.parent.parent.color = 'RED'
 					self.right_rotate(z.parent.parent)
+				elif z is z.parent.left:
+					z.parent.color = 'BLACK'
+					z.parent.parent.color = 'RED'
+					self.right_rotate(z.parent.parent)
 			else:
 				y = z.parent.parent.left
-				if y.color is 'RED':
+				if y is not None and y.color is 'RED':
 					z.parent.color = 'BLACK'
 					y.color = 'BLACK'
+					z.parent.parent.color = 'RED'
 					z = z.parent.parent
 				elif z is z.parent.left:
 					z = z.parent
 					self.right_rotate(z)
-				z.parent.color = 'BLACK'
-				z.parent.parent.color = 'RED'
-				self.left_rotate(z.parent.parent)
+					z.parent.color = 'BLACK'
+					z.parent.parent.color = 'RED'
+					self.left_rotate(z.parent.parent)
+				elif z is z.parent.right:
+					z.parent.color = 'BLACK'
+					z.parent.parent.color = 'RED'
+					self.left_rotate(z.parent.parent)
+		self.root.color = 'BLACK'
 
 	def transplant(self, u, v):
 		""" Replace subtree rooted at node u with that of node v"""

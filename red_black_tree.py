@@ -12,6 +12,19 @@ class RedBlackTree(object):
 	def __init__(self):
 		self.nil = Node(None)
 		self.root = Node(None)
+	def nums_child_update(self, x):
+		"""Update number of children node for node x"""
+		if x.left is None:
+			if x.right is None:
+				x.nums_child = 0
+			else:
+				x.nums_child = x.right.nums_child + 1
+		else:
+			if x.right is None:
+				x.nums_child = x.left.nums_child + 1
+			else:
+				x.nums_child = x.left.nums_child + x.right.nums_child  + 2
+
 	def left_rotate(self, x):
 		""" Modify the change of number of children when left_rotate"""
 		y = x.right
@@ -27,8 +40,8 @@ class RedBlackTree(object):
 			x.parent.right = y
 		y.left = x
 		x.parent = y
-		#x.nums_child = x.left.nums_child + x.right.nums_child + 2
-		#y.nums_child = y.left.nums_child + y.right.nums_child + 2
+		self.nums_child_update(x)	
+		self.nums_child_update(y)
 
 	def right_rotate(self, y):
 		""" Modify the change of number of children when right_rotate"""
@@ -45,8 +58,8 @@ class RedBlackTree(object):
 			y.parent.left = x
 		x.right = y
 		y.parent = x
-		#x.nums_child = x.left.nums_child + x.right.nums_child + 2
-		#y.nums_child = y.left.nums_child + y.right.nums_child + 2
+		self.nums_child_update(x)	
+		self.nums_child_update(y)
 
 	def insert(self, z):
 		if self.root.key is None:
@@ -68,6 +81,10 @@ class RedBlackTree(object):
 		else:
 			y.right = z
 		z.color = 'RED'
+		node = z
+		while node is not self.root:
+			node.parent.nums_child = node.parent.nums_child + 1
+			node = node.parent
 		self.insert_fix_up(z)
 
 	def insert_fix_up(self, z):

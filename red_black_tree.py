@@ -49,7 +49,7 @@ class RedBlackTree(object):
 		y.left = x.right
 		if x.right is not None:
 			x.right.parent = y
-		x,parent = y.parent
+		x.parent = y.parent
 		if y.parent is self.root:
 			self.root = x
 		elif y is y.parent.right:
@@ -61,7 +61,8 @@ class RedBlackTree(object):
 		self.nums_child_update(x)	
 		self.nums_child_update(y)
 
-	def insert(self, z):
+	def insert(self, key):
+		z = Node(key)
 		if self.root.key is None:
 			self.root = z
 			self.root.color = 'BLACK'
@@ -180,7 +181,7 @@ class RedBlackTree(object):
 
 	def min(self, x):
 	  """Return the node with minumin key given subtree rooted at node x"""
-	  while x.left is not self.nil:
+	  while x.left is not None:
 	  	x = x.left
 	  return x
 
@@ -216,34 +217,33 @@ class RedBlackTree(object):
 				w = x.parent.left
 				if w.color is 'RED':
 					w.color == 'BLACK'
-    			w.parent.color = 'RED'
-    			self.right_rotate(x.parent)
-    			w = x.parent.left
-    		if w.right.color is 'BLACK' and w.left.color is 'BLACK':
-    			w.color = 'RED'
-    			x = x.parent
-    		elif w.left.color is 'BLACK':
-    			w.right.color = 'BLACK'
-    			w.color = 'RED'
-    			self.left_rotate(w)
-    			w = x.parent.left
-    		w.color = x.parent.color
-    		x.parent.color = 'BLACK'
-    		w.left.color = 'BLACK'
-    		self.right_rotate(x.parent)
-    		x = self.root
+					w.parent.color = 'RED'
+					self.right_rotate(x.parent)
+	  			w = x.parent.left
+				if w.right.color is 'BLACK' and w.left.color is 'BLACK':
+					w.color = 'RED'
+					x = x.parent
+				elif w.left.color is 'BLACK':
+					w.right.color = 'BLACK'
+					w.color = 'RED'
+					self.left_rotate(w)
+					w = x.parent.left
+				w.color = x.parent.color
+				x.parent.color = 'BLACK'
+				w.left.color = 'BLACK'
+				self.right_rotate(x.parent)
+				x = self.root
 
-def rank(self, key):
-  	"""Return number of nodes with key that are smaller than or equal the given key"""
-  	number = 0
-  	x = self.root
-  	while x is not self.nil:
-  		if x.key <= key:
-  			number = number + 2 + x.left.nums_child
-  			x = x.right
-  		else:
-  			x = x.left
-  	return number
+	def rank(self, key):
+		number = 0
+		x = self.root
+		while x is not None:
+			if x.key <= key:
+				number = number + 2 + x.left.nums_child
+				x = x.right
+			else:
+				x = x.left
+		return number
 
 	def count(self, start, end):
 		"""Return number of nodes with key that are smmaller than or equal 'end' and greater or equal than 'start'"""
@@ -276,30 +276,30 @@ def rank(self, key):
 
 	def list(self, start, end):
 		"""Return a list of nodes with key that are smmaller than or equal 'end' and greater or equal than 'start'"""
-		node = self.lca(start, end)
+		node = self.lca(start, end) 
 		result = self.node_list(node, start, end)
 		return result
 
-	class TraceRedBlackTree(RedBlackTree):
-		"""Augments RedBlackTree to build a trace for the visualizer"""
-		def __init__(self, trace):
-			RedBlackTree.__init__(self)
-			self.trace = trace
+class TraceRedBlackTree(RedBlackTree):
+	"""Augments RedBlackTree to build a trace for the visualizer"""
+	def __init__(self, trace):
+		RedBlackTree.__init__(self)
+		self.trace = trace
 
-		def insert(self, node):
-			self.trace.append({'type': 'add', 'id' : node.wire.name})
-			RedBlackTree.insert(self, node)
+	def insert(self, node):
+		self.trace.append({'type': 'add', 'id' : node.wire.name})
+		RedBlackTree.insert(self, node)
 
-		def delete(self, node):
-			self.trace.append({'type': 'delete', 'id': node.wire.name})
-			RedBlackTree.remove(self, node)
+	def delete(self, node):
+		self.trace.append({'type': 'delete', 'id': node.wire.name})
+		RedBlackTree.remove(self, node)
 
-		def list(self, start, end):
-			result = RedBlackTree.list(self, start, end)
-			self.trace.append({'type': 'list', 'from': start, 'to': end, 'ids': restul})
-			return result
+	def list(self, start, end):
+		result = RedBlackTree.list(self, start, end)
+		self.trace.append({'type': 'list', 'from': start, 'to': end, 'ids': restul})
+		return result
 
-		def count(self, start, end):
-			result = RedBlackTree.count(self, start, end)
-			self.trace.append({'type': 'count', 'from': start, 'to': end, 'id': result})
-			return result
+	def count(self, start, end):
+		result = RedBlackTree.count(self, start, end)
+		self.trace.append({'type': 'count', 'from': start, 'to': end, 'id': result})
+		return result

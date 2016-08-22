@@ -98,11 +98,14 @@ class WireLayer(object):
     return layer
 
 tree = RedBlackTree()
-nodes = [Node(1), Node(2), Node(3), Node(4), Node(5), Node(6), Node(7)]
-for node in nodes:
-  tree.insert(node)
+i = 0
+while i <= 100:
+  tree.insert(i)
+  i = i + 1
+
+tree.delete(31)
 
 node = tree.root
 while node is not None:
   print(node.key)
-  node = node.right
+  node = node.left

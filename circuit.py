@@ -102,10 +102,6 @@ i = 0
 while i <= 100:
   tree.insert(i)
   i = i + 1
-
-tree.delete(31)
-
-node = tree.root
-while node is not None:
+node_list = tree.list(20, 30)
+for node in node_list:
   print(node.key)
-  node = node.left

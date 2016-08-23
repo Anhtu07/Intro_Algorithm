@@ -134,7 +134,8 @@ class RedBlackTree(object):
 			u.parent.left = v
 		else:
 			u.parent.right = v
-		v.parent = u.parent
+		if v is not None:
+			v.parent = u.parent
 
 	def search(self, key):
 		"""Return node with the specified key"""
@@ -156,7 +157,7 @@ class RedBlackTree(object):
 			return
 		y = z
 		y_origin_color = y.color
-		if z.left is self.nil:
+		if z.left is None:
 			x = z.right
 			self.transplant(z, z.right)
 		elif z.right is self.nil:
@@ -192,7 +193,7 @@ class RedBlackTree(object):
 		return x
 
 	def delete_fix_up(self, x):
-		while x is not self.root and x.color is 'BLACK':
+		while x is not None and x is not self.root and x.color is 'BLACK':
 			if x is x.parent.left:
 				w = x.parent.right
 				if w.color is 'RED':
@@ -208,18 +209,24 @@ class RedBlackTree(object):
 					w.color = 'RED'
 					self.right_rotate(w)
 					w = x.parent.right
-				w.color = x.parent.color
-				x.parent.color = 'BLACK'
-				w.right.color = 'BLACK'
-				self.left_rotate(x.parent)
-				x = self.root
+					w.color = x.parent.color
+					x.parent.color = 'BLACK'
+					w.right.color = 'BLACK'
+					self.left_rotate(x.parent)
+					x = self.root
+				else:
+					w.color = x.parent.color
+					x.parent.color = 'BLACK'
+					w.right.color = 'BLACK'
+					self.left_rotate(x.parent)
+					x = self.root
 			else:
 				w = x.parent.left
 				if w.color is 'RED':
 					w.color == 'BLACK'
 					w.parent.color = 'RED'
 					self.right_rotate(x.parent)
-	  			w = x.parent.left
+					w = x.parent.left
 				if w.right.color is 'BLACK' and w.left.color is 'BLACK':
 					w.color = 'RED'
 					x = x.parent
@@ -228,18 +235,29 @@ class RedBlackTree(object):
 					w.color = 'RED'
 					self.left_rotate(w)
 					w = x.parent.left
-				w.color = x.parent.color
-				x.parent.color = 'BLACK'
-				w.left.color = 'BLACK'
-				self.right_rotate(x.parent)
-				x = self.root
+					w.color = x.parent.color
+					x.parent.color = 'BLACK'
+					w.left.color = 'BLACK'
+					self.right_rotate(x.parent)
+					x = self.root
+				else:
+					w.color = x.parent.color
+					x.parent.color = 'BLACK'
+					w.left.color = 'BLACK'
+					self.right_rotate(x.parent)
+					x = self.root
+		if x is not None:
+			x.color = 'BLACK'
 
 	def rank(self, key):
 		number = 0
 		x = self.root
 		while x is not None:
 			if x.key <= key:
-				number = number + 2 + x.left.nums_child
+				if x.left is None:
+					number = number + 1
+				else :
+					number = number + 2 + x.left.nums_child
 				x = x.right
 			else:
 				x = x.left
@@ -256,7 +274,7 @@ class RedBlackTree(object):
 		"""Lowest Common Ancestor"""
 		x = self.root
 		while x is not self.nil or (low <= x.key and h >= x.key):
-			if low < x.ley:
+			if low < x.key:
 				x = x.left
 			else:
 				x = x.right

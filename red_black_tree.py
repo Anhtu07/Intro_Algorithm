@@ -273,29 +273,32 @@ class RedBlackTree(object):
 	def lca(self, low, high):
 		"""Lowest Common Ancestor"""
 		x = self.root
-		while x is not self.nil or (low <= x.key and h >= x.key):
+		while x is not None and (low > x.key or high < x.key):
 			if low < x.key:
 				x = x.left
 			else:
 				x = x.right
 		return x
 
-	def node_list(node, low, high):
-		result = []
-		if node is self.nil:
+	def node_list(self, node, low, high, result):
+		if node is None:
 			return result
 		if low <= node.key and node.key <= high:
+			print(node.key)
 			result.append(node)
-		if low < node.key:
-			self.node_list(node.right, low, high)
+		if low <= node.key:
+			print("low")
+			self.node_list(node.left, low, high, result)
 		if node.key <= high:
-			self.node_list(node.left, low, high)
+			print("high")
+			self.node_list(node.right, low, high, result)
 		return result
 
 	def list(self, start, end):
 		"""Return a list of nodes with key that are smmaller than or equal 'end' and greater or equal than 'start'"""
-		node = self.lca(start, end) 
-		result = self.node_list(node, start, end)
+		node = self.lca(start, end)
+		result = []
+		result = self.node_list(node, start, end, result)
 		return result
 
 class TraceRedBlackTree(RedBlackTree):

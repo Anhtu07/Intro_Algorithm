@@ -42,6 +42,7 @@ class Wire(object):
     return v.y1 <= h.y1 and h.y1 <= v.y2 and h.x1 <= v.x1 and v.x1 <= h.x2
   
   def __repr__(self):
+
     # :nodoc: nicer formatting to help with debugging
     return('<wire ' + self.name + ' (' + str(self.x1) + ',' + str(self.y1) + 
            ')-(' + str(self.x2) + ',' + str(self.y2) + ')>')
@@ -102,6 +103,19 @@ i = 0
 while i <= 100:
   tree.insert(i)
   i = i + 1
-node_list = tree.list(20, 30)
-for node in node_list:
+print(tree.root.key)
+print(tree.root.left.key)
+print(tree.root.left.left.key)
+print(tree.root.left.right.key)
+print(tree.root.left.left.left.key)
+print(tree.root.left.left.right.key)
+print(tree.root.left.right.left.key)
+print(tree.root.left.right.right.key)
+print(tree.root.left.right.left.left.key)
+print(tree.root.left.right.left.right.key)
+print(" ")
+result = []
+la = tree.list(20, 40)
+print(" ")
+for node in la:
   print(node.key)

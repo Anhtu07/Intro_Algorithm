@@ -1,5 +1,5 @@
 class Node(object):
-	def __init__(self, key):
+	def __init__(self, key, wire):
 		self.left = None
 		self.right = None
 		self.parent = None
@@ -7,6 +7,8 @@ class Node(object):
 		self.key = key
 		self.color =  None
 		self.nums_child = 0
+		
+		self.wire = wire
 
 class RedBlackTree(object):
 	def __init__(self):
@@ -61,8 +63,7 @@ class RedBlackTree(object):
 		self.nums_child_update(x)	
 		self.nums_child_update(y)
 
-	def insert(self, key):
-		z = Node(key)
+	def insert(self, z):
 		if self.root.key is None:
 			self.root = z
 			self.root.color = 'BLACK'
@@ -151,8 +152,7 @@ class RedBlackTree(object):
 			else:
 				return None
 
-	def delete(self, key):
-		z = self.search(key)
+	def delete(self, z):
 		if z is None:
 			return
 		y = z
@@ -188,7 +188,7 @@ class RedBlackTree(object):
 
 	def max(self, x):
 		"""Return the node with maximum key given subtree rooted at node x"""
-		while x.right is not self.nil:
+		while x.right is not None:
 			x = x.right
 		return x
 
@@ -322,5 +322,5 @@ class TraceRedBlackTree(RedBlackTree):
 
 	def count(self, start, end):
 		result = RedBlackTree.count(self, start, end)
-		self.trace.append({'type': 'count', 'from': start, 'to': end, 'id': result})
+		self.trace.append({'type': 'count', 'from': start, 'to': end, 'ids': result})
 		return result

@@ -12,8 +12,10 @@ class Node(object):
 
 class RedBlackTree(object):
 	def __init__(self):
-		self.nil = Node(None)
-		self.root = Node(None)
+		self.nil = Node(None, None)
+		self.nil.color = 'BLACK'
+		self.root = Node(None, None)
+		
 	def nums_child_update(self, x):
 		"""Update number of children node for node x"""
 		if x.left is None:
@@ -34,7 +36,7 @@ class RedBlackTree(object):
 		if y.left is not None:
 			y.left.parent = x
 		y.parent = x.parent
-		if x is self.root:
+		if x.parent is self.nil:
 			self.root = y
 		elif x == x.parent.left:
 			x.parent.left = y
@@ -52,7 +54,7 @@ class RedBlackTree(object):
 		if x.right is not None:
 			x.right.parent = y
 		x.parent = y.parent
-		if y.parent is self.root:
+		if y.parent is self.nil:
 			self.root = x
 		elif y is y.parent.right:
 			y.parent.right = x
@@ -67,7 +69,6 @@ class RedBlackTree(object):
 		if self.root.key is None:
 			self.root = z
 			self.root.color = 'BLACK'
-			self.nil.color = 'BLACK'
 			self.root.parent = self.nil
 			return
 		x = self.root
@@ -141,7 +142,7 @@ class RedBlackTree(object):
 	def search(self, key):
 		"""Return node with the specified key"""
 		x = self.root
-		while x is not self.nil:
+		while x is not None:
 			y = x
 			if x.key > key:
 				x = x.left
@@ -160,16 +161,14 @@ class RedBlackTree(object):
 		if z.left is None:
 			x = z.right
 			self.transplant(z, z.right)
-		elif z.right is self.nil:
+		elif z.right is None:
 			x = z.left
 			self.transplant(z, z.left)
 		else:
 			y = self.min(z.right)
 			y_origin_color = y.color
 			x = y.right
-			if y.parent is z:
-				x.parent = y
-			else:
+			if y.parent is not z:
 				self.transplant(y, y.right)
 				y.right = z.right
 				y.right.parent = y
@@ -182,6 +181,8 @@ class RedBlackTree(object):
 
 	def min(self, x):
 	  """Return the node with minumin key given subtree rooted at node x"""
+	  if x is None:
+	  	return None
 	  while x.left is not None:
 	  	x = x.left
 	  return x
@@ -284,13 +285,10 @@ class RedBlackTree(object):
 		if node is None:
 			return result
 		if low <= node.key and node.key <= high:
-			print(node.key)
 			result.append(node)
 		if low <= node.key:
-			print("low")
 			self.node_list(node.left, low, high, result)
 		if node.key <= high:
-			print("high")
 			self.node_list(node.right, low, high, result)
 		return result
 

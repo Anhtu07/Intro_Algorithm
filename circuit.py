@@ -128,18 +128,21 @@ class TracedResultSet(ResultSet):
                        'id2': wire2.name})
     ResultSet.add_crossing(self, wire1, wire2)
 
-class CrossVerifier(Object):
+class CrossVerifier(object):
 	def __init__(self, layer):
+		self.events = []
 		self.events_from_layer(layer)
+		self.events.sort()
+		self.tree_y = RedBlackTree()
+		self.tree_x = RedBlackTree()
+
 		self.result = ResultSet()
-		self.vertical_wires = []
-		self.horizontal_wires = RedBlackTree()
 		self.performed = False
 
 	def count_crossings(self):
-	  if self.performed:
+		if self.performed:
 			raise
-		self.performed True
+		self.performed = True
 		return self.compute_crossing(True)
 
 	def wire_crossings(self):
@@ -149,64 +152,84 @@ class CrossVerifier(Object):
 		return self.compute_crossing(False)
 
 	def events_from_layer(self, layer):
-		for wire in layer.wire.value():
+		for wire in layer.wires.values():
 			if wire.is_horizontal():
-				self.horizontal_wires.insert(Node(wire.y1, wire))
+				self.events.append([wire.x1, 'horizontal', wire])
 			else:
-				self.vertical_wires.append(wire)
+				self.events.append([wire.x1, 'vertical', wire])
 
 	def compute_crossing(self, count_only):
-		cross = []
+		start_add = 0
+		start_del = 0
+		end_add = 0
+		end_del = 0
+
 		if count_only:
 			result = 0
 		else:
 			result = ResultSet()
-		for v_wire in vertical_wires:
-			self.trace_sweep_line(v_wire.x1)
-			cross = horizontal_wires.list(wire.y1 wire.y2)
-			for h_wire in cross:
-				if h_wire.x2 < v_wire.x2:
-					cross.remove(h_wire)
-			if count_only:
-				result += len(cross)
-			else:
-				for h_wire in cross:
-				result.add_crossing(h_wire, v_wire) 
-		return result
+
+		for event in self.events:
+			event_type, wire = event[1], event[2]
+			end_add += 1
+			if event_type is 'vertical':
+				temp = wire.x2
+				i = start_add
+				while i < end_add - 1:
+					if self.events[i][2].x2 > temp:
+						self.tree_y.insert(Node(self.events[i][2].y1, self.events[i][2]))
+					i += 1
+
+				k = start_del
+				while k < end_del - 1:
+					if self.events[k][2].x2 < temp:
+						self.tree_y.delete(self.tree_y.search(self.events[k][2].y1))
+					k += 1
+
+				start_del = end_del
+				start_add = end_add
+				end_del = start_add
+
+				if count_only:
+					result += self.tree_y.count(wire.y1, wire.y2)
+				else:
+					node_list = self.tree_y.list(wire.y1, wire.y2)
+					for node in node_list:
+						result.add_crossing(node.wire, wire)
+		return result	
 
 	def trace_sweep_line(self, x):
 		pass
 
 class TracedCrossVerifier(CrossVerifier):
-  """Augments CrossVerifier to build a trace for the visualizer."""
-  
-  def __init__(self, layer):
-    CrossVerifier.__init__(self, layer)
-    self.trace = []
-    self.index = TracedRangeIndex(self.trace)
-    self.result_set = TracedResultSet(self.trace)
-    
-  def trace_sweep_line(self, x):
-    self.trace.append({'type': 'sweep', 'x': x})
-    
-  def trace_as_json(self):
-    """List that obeys the JSON format restrictions with the verifier trace."""
-    return self.trace
+	"""Augments CrossVerifier to build a trace for the visualizer."""
+	def __init__(self, layer):
+		CrossVerifier.__init__(self, layer)
+		self.trace = []
+		self.index = TracedRangeIndex(self.trace)
+		self.result_set = TracedResultSet(self.trace)
+
+	def trace_sweep_line(self, x):
+		self.trace.append({'type': 'sweep', 'x': x})
+
+	def trace_as_json(self):
+		"""List that obeys the JSON format restrictions with the verifier trace."""
+		return self.trace
 
 # Command-line controller.
 if __name__ == '__main__':
-    import sys
-    layer = WireLayer.from_file(sys.stdin)
-    verifier = CrossVerifier(layer)
-    
-    if os.environ.get('TRACE') == 'jsonp':
-      verifier = TracedCrossVerifier(layer)
-      result = verifier.wire_crossings()
-      json_obj = {'layer': layer.as_json(), 'trace': verifier.trace_as_json()}
-      sys.stdout.write('onJsonp(')
-      json.dump(json_obj, sys.stdout)
-      sys.stdout.write(');\n')
-    elif os.environ.get('TRACE') == 'list':
-      verifier.wire_crossings().write_to_file(sys.stdout)
-    else:
-      sys.stdout.write(str(verifier.count_crossings()) + "\n")
+		import sys
+		layer = WireLayer.from_file(sys.stdin)
+		verifier = CrossVerifier(layer)
+
+		if os.environ.get('TRACE') == 'jsonp':
+			verifier = TracedCrossVerifier(layer)
+			result = verifier.wire_crossings()
+			json_obj = {'layer': layer.as_json(), 'trace': verifier.trace_as_json()}
+			sys.stdout.write('onJsonp(')
+			json.dump(json_obj, sys.stdout)
+			sys.stdout.write(');\n')
+		elif os.environ.get('TRACE') == 'list':
+			verifier.wire_crossings().write_to_file(sys.stdout)
+		else:
+			sys.stdout.write(str(verifier.count_crossings()) + "\n")

@@ -2,6 +2,7 @@
 
 import unittest
 from dnaseqlib import *
+from kfasta import *
 
 ### Utility classes ###
 
@@ -23,7 +24,26 @@ class Multidict:
 # and their hashes.  (What else do you need to know about each
 # subsequence?)
 def subsequenceHashes(seq, k):
-    raise Exception("Not implemented!")
+    subseq = ''
+    count = 0
+    h = RollingHash(subseq)
+    try:
+        while True:
+            if count == 0:            
+                while len(subseq) < k:
+                    subseq += seq.next()
+                h = RollingHash(subseq)
+                yield (subseq, h.current_hash)
+            else:
+                next_char = seq.next()
+                new_hash = h.slide(subseq[0], next_char)
+                subseq = subseq[1:]
+                subseq += next_char
+                yield(subseq, new_hash)
+            count += 1
+    except StopIteration:
+        return
+
 
 # Similar to subsequenceHashes(), but returns one k-length subsequence
 # every m nucleotides.  (This will be useful when you try to use two
@@ -38,10 +58,10 @@ def intervalSubsequenceHashes(seq, k, m):
 def getExactSubmatches(a, b, k, m):
     raise Exception("Not implemented!")
 
-if __name__ == '__main__':
-    if len(sys.argv) != 4:
-        print 'Usage: {0} [file_a.fa] [file_b.fa] [output.png]'.format(sys.argv[0])
-        sys.exit(1)
+#if __name__ == '__main__':
+#    if len(sys.argv) != 4:
+#        print 'Usage: {0} [file_a.fa] [file_b.fa] [output.png]'.format(sys.argv[0])
+#        sys.exit(1)
 
     # The arguments are, in order: 1) Your getExactSubmatches
     # function, 2) the filename to which the image should be written,
@@ -49,4 +69,7 @@ if __name__ == '__main__':
     # filename of sequence A, 5) the filename of sequence B, 6) k, the
     # subsequence size, and 7) m, the sampling interval for sequence
     # A.
-    compareSequences(getExactSubmatches, sys.argv[3], (500,500), sys.argv[1], sys.argv[2], 8, 100)
+#   compareSequences(getExactSubmatches, sys.argv[3], (500,500), sys.argv[1], sys.argv[2], 8, 100)
+la = subsequenceHashes(FastaSequence('data/fdog0.fa'), 2)
+for na in la:
+    print(na)

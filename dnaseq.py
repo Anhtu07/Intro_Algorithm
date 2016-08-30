@@ -66,8 +66,34 @@ def intervalSubsequenceHashes(seq, k, m):
 # that return nucleotides.  The table is built by computing one hash
 # every m nucleotides (for m >= k).
 def getExactSubmatches(a, b, k, m):
-    raise Exception("Not implemented!")
-
+    pairs = []
+    order = 0
+    subseq_a = subsequenceHashes(a, k)
+    subseq_b = subsequenceHashes(b, k)
+    table = Multidict(pairs)
+    for seq in subseq_b:
+        table.put(seq[1], ('b', order))
+        order += 1
+    print(table.data)
+    order = 0
+    for seq in subseq_a:
+        table.put(seq[1], ('a', order))
+        order += 1
+    print(table.data)
+    for hash_value in table.data:
+        a = []
+        b = []
+        for pair in table.data[hash_value]:
+            if pair[0] == 'a':
+                a.append(pair[1])
+            else:
+                b.append(pair[1])
+        if len(a) > 0:
+            if len(b) > 0:
+                for value_a in a:
+                    for value_b in b:
+                        pairs.append((value_a, value_b))
+    return pairs
 #if __name__ == '__main__':
 #    if len(sys.argv) != 4:
 #        print 'Usage: {0} [file_a.fa] [file_b.fa] [output.png]'.format(sys.argv[0])
@@ -80,10 +106,5 @@ def getExactSubmatches(a, b, k, m):
     # subsequence size, and 7) m, the sampling interval for sequence
     # A.
 #   compareSequences(getExactSubmatches, sys.argv[3], (500,500), sys.argv[1], sys.argv[2], 8, 100)
-la = subsequenceHashes(FastaSequence('data/fchimp0.fa'), 2)
-dictionary = Multidict(la)
-print("")
-for na in la:
-    dictionary.put(na[1], na[0])
-print(dictionary.data)
-print(dictionary.get('TA'))
+la = getExactSubmatches(FastaSequence('data/test.fa'), FastaSequence('data/test2.fa'), 2, 30)
+print(la)

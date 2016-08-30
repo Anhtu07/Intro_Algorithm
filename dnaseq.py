@@ -10,15 +10,25 @@ from kfasta import *
 class Multidict:
     # Initializes a new multi-value dictionary, and adds any key-value
     # 2-tuples in the iterable sequence pairs to the data structure.
-    def __init__(self, pairs=[]):
-        raise Exception("Not implemented!")
+    def __init__(self, pairs):
+        self.data = {}
+        for pair in pairs:
+            self.put(pair[0], pair[1])
     # Associates the value v with the key k.
     def put(self, k, v):
-        raise Exception("Not implemented!")
+        if self.data.has_key(k):
+            self.data[k].append(v)
+        else:
+            self.data[k] = []
+            self.data[k].append(v)
     # Gets any values that have been associated with the key k; or, if
     # none have been, returns an empty sequence.
     def get(self, k):
-        raise Exception("Not implemented!")
+        if self.data.has_key(k):
+            return self.data[k]
+        else:
+            result = []
+            return result
 
 # Given a sequence of nucleotides, return all k-length subsequences
 # and their hashes.  (What else do you need to know about each
@@ -70,6 +80,10 @@ def getExactSubmatches(a, b, k, m):
     # subsequence size, and 7) m, the sampling interval for sequence
     # A.
 #   compareSequences(getExactSubmatches, sys.argv[3], (500,500), sys.argv[1], sys.argv[2], 8, 100)
-la = subsequenceHashes(FastaSequence('data/fdog0.fa'), 2)
+la = subsequenceHashes(FastaSequence('data/fchimp0.fa'), 2)
+dictionary = Multidict(la)
+print("")
 for na in la:
-    print(na)
+    dictionary.put(na[1], na[0])
+print(dictionary.data)
+print(dictionary.get('TA'))

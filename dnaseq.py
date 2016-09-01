@@ -18,6 +18,7 @@ class Multidict:
     def put(self, k, v):
         if self.data.has_key(k):
             self.data[k].append(v)
+            print('la')
         else:
             self.data[k] = []
             self.data[k].append(v)
@@ -43,13 +44,13 @@ def subsequenceHashes(seq, k):
                 while len(subseq) < k:
                     subseq += seq.next()
                 h = RollingHash(subseq)
-                yield (subseq, h.current_hash)
+                yield (h.curhash, subseq)
             else:
                 next_char = seq.next()
                 new_hash = h.slide(subseq[0], next_char)
                 subseq = subseq[1:]
                 subseq += next_char
-                yield(subseq, new_hash)
+                yield(new_hash, subseq)
             count += 1
     except StopIteration:
         return
@@ -59,7 +60,22 @@ def subsequenceHashes(seq, k):
 # every m nucleotides.  (This will be useful when you try to use two
 # whole data files.)
 def intervalSubsequenceHashes(seq, k, m):
-    raise Exception("Not implemented!")
+    subseq = ''
+    pos = 0
+
+    try:
+        while True:
+            for i in range(0,k):
+                subseq += seq.next()
+            rh = RollingHash(subseq)
+            yield (rh.curhash, (pos, subseq))
+            for i in range(0, m-k):
+                seq.next()
+            pos += m
+            subseq = ''
+    except StopIteration:
+        return
+
 
 # Searches for commonalities between sequences a and b by comparing
 # subsequences of length k.  The sequences a and b should be iterators
@@ -92,8 +108,7 @@ def getExactSubmatches(a, b, k, m):
             if len(b) > 0:
                 for value_a in a:
                     for value_b in b:
-                        pairs.append((value_a, value_b))
-    return pairs
+                        yield((value_a, value_b))
 #if __name__ == '__main__':
 #    if len(sys.argv) != 4:
 #        print 'Usage: {0} [file_a.fa] [file_b.fa] [output.png]'.format(sys.argv[0])
@@ -106,5 +121,6 @@ def getExactSubmatches(a, b, k, m):
     # subsequence size, and 7) m, the sampling interval for sequence
     # A.
 #   compareSequences(getExactSubmatches, sys.argv[3], (500,500), sys.argv[1], sys.argv[2], 8, 100)
-la = getExactSubmatches(FastaSequence('data/test.fa'), FastaSequence('data/test2.fa'), 2, 30)
-print(la)
+la = intervalSubsequenceHashes(FastaSequence('data/fchimp0.fa'), 4, 6)
+for na in la:
+    print(na)

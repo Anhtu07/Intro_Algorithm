@@ -109,10 +109,10 @@ def getExactSubmatches(a, b, k, m):
                 for value_a in a:
                     for value_b in b:
                         yield((value_a, value_b))
-#if __name__ == '__main__':
-#    if len(sys.argv) != 4:
-#        print 'Usage: {0} [file_a.fa] [file_b.fa] [output.png]'.format(sys.argv[0])
-#        sys.exit(1)
+if __name__ == '__main__':
+    if len(sys.argv) != 4:
+        print 'Usage: {0} [file_a.fa] [file_b.fa] [output.png]'.format(sys.argv[0])
+        sys.exit(1)
 
     # The arguments are, in order: 1) Your getExactSubmatches
     # function, 2) the filename to which the image should be written,
@@ -120,7 +120,4 @@ def getExactSubmatches(a, b, k, m):
     # filename of sequence A, 5) the filename of sequence B, 6) k, the
     # subsequence size, and 7) m, the sampling interval for sequence
     # A.
-#   compareSequences(getExactSubmatches, sys.argv[3], (500,500), sys.argv[1], sys.argv[2], 8, 100)
-la = intervalSubsequenceHashes(FastaSequence('data/fchimp0.fa'), 4, 6)
-for na in la:
-    print(na)
+   compareSequences(getExactSubmatches, sys.argv[3], (500,500), sys.argv[1], sys.argv[2], 8, 100)

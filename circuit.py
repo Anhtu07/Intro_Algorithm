@@ -173,16 +173,16 @@ class CrossVerifier(object):
 			event_type, wire = event[1], event[2]
 			end_add += 1
 			if event_type is 'vertical':
-				temp = wire.x2
+				bar = wire.x2
 				i = start_add
 				while i < end_add - 1:
-					if self.events[i][2].x2 > temp:
+					if self.events[i][2].x2 >= bar:
 						self.tree_y.insert(Node(self.events[i][2].y1, self.events[i][2]))
 					i += 1
 
 				k = start_del
 				while k < end_del - 1:
-					if self.events[k][2].x2 < temp:
+					if self.events[k][2].x2 < bar:
 						self.tree_y.delete(self.tree_y.search(self.events[k][2].y1))
 					k += 1
 

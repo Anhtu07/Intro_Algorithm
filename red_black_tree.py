@@ -79,7 +79,7 @@ class RedBlackTree(object):
 			else:
 				x = x.right
 		z.parent = y
-		if z.key < y.key:
+		if z.key <= y.key:
 			y.left = z
 		else:
 			y.right = z
